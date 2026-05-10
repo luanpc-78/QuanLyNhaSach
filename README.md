@@ -9,7 +9,7 @@
 
 **Tên Dự Án:** Hệ Thống Quản Lý Nhà Sách  
 **Loại:** Dự Án Học Tập / Khóa Luận Tốt Nghiệp  
-**Trường:** NTTU (Trường Đại Học Nông Lâm TP.HCM) & NIIE  
+**Trường:** NTTU (Trường Đại Học Nguyễn Tất Thành) & NIIE  
 **Ngôn Ngữ:** C#  
 **Framework:** .NET 10 (Windows Forms)  
 **Cơ Sở Dữ Liệu:** Microsoft SQL Server  
