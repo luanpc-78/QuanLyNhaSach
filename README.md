@@ -21,11 +21,11 @@
 
 | STT | Họ Tên | MSSV | Email |
 |:---:|:---|:---|:---|
-| 1 | Phan Công Luận | 2311559057
-| 2 | Hồ Lâm Minh Thái | 2311558432
-| 3 | Nguyễn Quang Hưng | 2311560344
-| 4 | Nguyễn Ân Phát | 2311558386
-| 5 | Nguyễn Duy Khiêm | 2311560212
+| 1 | Phan Công Luận | 2311559057 | 2311559057@nttu.edu.vn
+| 2 | Hồ Lâm Minh Thái | 2311558432 | 2311558432@nttu.edu.vn
+| 3 | Nguyễn Quang Hưng | 2311560344 | 2311560344@nttu.edu.vn
+| 4 | Nguyễn Ân Phát | 2311558386 | 2311558386@nttu.edu.vn
+| 5 | Nguyễn Duy Khiêm | 2311560212 | 2311560212@nttu.edu.vn
 
 ---
 
