@@ -4,6 +4,7 @@ using Microsoft.Data.SqlClient;
 using System.Windows.Forms;
 using QuanLyNhaSach.DAL;
 using System.IO;
+using OfficeOpenXml;
 
 namespace QuanLyNhaSach
 {
@@ -273,32 +274,77 @@ namespace QuanLyNhaSach
 
         private void ExportToExcel(string filePath)
         {
-            using (StreamWriter writer = new StreamWriter(filePath, false, System.Text.Encoding.UTF8))
+            using (var package = new ExcelPackage())
             {
+                var worksheet = package.Workbook.Worksheets.Add("BáoCáoCôngNợ");
                 int thang = cboThang.SelectedIndex + 1;
                 int nam = (int)numNam.Value;
 
-                writer.WriteLine($"BÁO CÁO CÔNG NỢ - THÁNG {thang}/{nam}");
-                writer.WriteLine($"Ngày xuất: {DateTime.Now:dd/MM/yyyy HH:mm}");
-                writer.WriteLine();
-                writer.WriteLine("Mã KH\tKhách Hàng\tĐịa Chỉ\tNợ Đầu\tPhát Sinh\tNợ Cuối");
+                // Tiêu đề
+                worksheet.Cells[1, 1].Value = $"BÁO CÁO CÔNG NỢ - THÁNG {thang}/{nam}";
+                worksheet.Cells[1, 1].Style.Font.Size = 14;
+                worksheet.Cells[1, 1].Style.Font.Bold = true;
+                worksheet.Cells[1, 1, 1, 6].Merge = true;
 
-                foreach (DataGridViewRow row in dgvBaoCaoCongNo.Rows)
+                // Ngày xuất
+                worksheet.Cells[2, 1].Value = $"Ngày xuất: {DateTime.Now:dd/MM/yyyy HH:mm}";
+                worksheet.Cells[2, 1].Style.Font.Size = 10;
+
+                // Header
+                string[] headers = { "Mã KH", "Khách Hàng", "Địa Chỉ", "Nợ Đầu", "Phát Sinh", "Nợ Cuối" };
+                for (int i = 0; i < headers.Length; i++)
                 {
-                    if (row.IsNewRow) continue;
-                    writer.WriteLine(string.Join("\t",
-                        row.Cells["MaKH"].Value ?? "",
-                        row.Cells["HoTen"].Value ?? "",
-                        row.Cells["DiaChi"].Value ?? "",
-                        row.Cells["NoDau"].Value ?? "",
-                        row.Cells["PhatSinh"].Value ?? "",
-                        row.Cells["NoCuoi"].Value ?? ""));
+                    worksheet.Cells[4, i + 1].Value = headers[i];
+                    worksheet.Cells[4, i + 1].Style.Font.Bold = true;
+                    worksheet.Cells[4, i + 1].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    worksheet.Cells[4, i + 1].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
                 }
 
-                writer.WriteLine();
-                writer.WriteLine(lblTongNoDau.Text);
-                writer.WriteLine(lblTongPhatSinh.Text);
-                writer.WriteLine(lblTongNoCuoi.Text);
+                // Dữ liệu
+                int row = 5;
+                foreach (DataGridViewRow dgRow in dgvBaoCaoCongNo.Rows)
+                {
+                    if (dgRow.IsNewRow) continue;
+
+                    worksheet.Cells[row, 1].Value = dgRow.Cells["MaKH"].Value ?? "";
+                    worksheet.Cells[row, 2].Value = dgRow.Cells["HoTen"].Value ?? "";
+                    worksheet.Cells[row, 3].Value = dgRow.Cells["DiaChi"].Value ?? "";
+                    worksheet.Cells[row, 4].Value = dgRow.Cells["NoDau"].Value ?? 0;
+                    worksheet.Cells[row, 5].Value = dgRow.Cells["PhatSinh"].Value ?? 0;
+                    worksheet.Cells[row, 6].Value = dgRow.Cells["NoCuoi"].Value ?? 0;
+
+                    // Format tiền tệ
+                    worksheet.Cells[row, 4].Style.Numberformat.Format = "#,##0";
+                    worksheet.Cells[row, 5].Style.Numberformat.Format = "#,##0";
+                    worksheet.Cells[row, 6].Style.Numberformat.Format = "#,##0";
+
+                    row++;
+                }
+
+                // Tổng cộng
+                row += 1;
+                worksheet.Cells[row, 1].Value = "TỔNG CỘNG";
+                worksheet.Cells[row, 1].Style.Font.Bold = true;
+                worksheet.Cells[row, 4].Value = lblTongNoDau.Text.Replace("📊 Tổng nợ đầu: ", "").Replace(" VNĐ", "").Replace(",", "");
+                worksheet.Cells[row, 5].Value = lblTongPhatSinh.Text.Replace("📈 Tổng phát sinh: ", "").Replace(" VNĐ", "").Replace(",", "");
+                worksheet.Cells[row, 6].Value = lblTongNoCuoi.Text.Replace("💰 Tổng nợ cuối: ", "").Replace(" VNĐ", "").Replace(",", "");
+
+                worksheet.Cells[row, 4].Style.Font.Bold = true;
+                worksheet.Cells[row, 5].Style.Font.Bold = true;
+                worksheet.Cells[row, 6].Style.Font.Bold = true;
+                worksheet.Cells[row, 4].Style.Numberformat.Format = "#,##0";
+                worksheet.Cells[row, 5].Style.Numberformat.Format = "#,##0";
+                worksheet.Cells[row, 6].Style.Numberformat.Format = "#,##0";
+
+                // Tự động điều chỉnh độ rộng cột
+                worksheet.Column(1).Width = 10;
+                worksheet.Column(2).Width = 25;
+                worksheet.Column(3).Width = 30;
+                worksheet.Column(4).Width = 15;
+                worksheet.Column(5).Width = 15;
+                worksheet.Column(6).Width = 15;
+
+                package.SaveAs(new FileInfo(filePath));
             }
         }
 
